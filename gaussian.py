@@ -11,7 +11,7 @@ doNotDownload = False
 
 # Define a gaussian function
 def gaussian_func(x, a, mu, sigma):
-    return a * np.exp(-(x-mu)**2/(2*sigma**2))
+    return a * np.exp(-(x - mu) ** 2 / (2 * sigma ** 2))
 
 regioni = {}
 
@@ -44,7 +44,7 @@ for line in fileRegioniList:
         regioni[nomeRegione] = []
     regioni[nomeRegione].append(line)
     
-with open('resources/lombardia.csv', 'w') as f:
+with open("resources/lombardia.csv", "w") as f:
     f.writelines("%s\n" % line for line in regioni["Lombardia"])
 
 # Gestione dati nazionali
@@ -63,7 +63,7 @@ for regione in regioni:
             nuoviContagiRegione[regione] = []
         nuoviContagiRegione[regione].append(line.split(',')[POS_POSITIVI])
 
-popt, pcov = [None]*len(nuoviContagiRegione), [None]*len(nuoviContagiRegione)
+popt, pcov = [None] * len(nuoviContagiRegione), [None] * len(nuoviContagiRegione)
 
 i = 0
 for contagiRegione in nuoviContagiRegione:
@@ -95,22 +95,22 @@ print("Model Relative Mean Squared Error:", RMSE)
 
 # Setup RGB colors
 N = len(regioni)
-HSV_tuples = [(x*1.0/N, 0.5, 0.5) for x in range(N)]
+HSV_tuples = [(x * 1.0 / N, 0.5, 0.5) for x in range(N)]
 RGB_tuples = list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))
 
 # Generate subplots
 fig, ax = plt.subplots()
-plt.subplots_adjust(left=0.45, bottom=0.1, right=0.96, top=0.95)
+plt.subplots_adjust(left = 0.45, bottom = 0.1, right = 0.96, top = 0.95)
 fig = plt.gcf()
 fig.set_size_inches(12.5, 8.5, forward=True)
-plt.xticks([0, 10, 20, 30, 40, 52, 60, 70, 80], ['24/2', '3/3', '12/3', '22/3', '1/4', '13/4', '22/4', '2/5', '12/5']) # pls automate me :'(
+plt.xticks([0, 10, 20, 30, 40, 52, 60, 70, 80], ["24/2", "3/3", "12/3", "22/3", "1/4", "13/4", "22/4", "2/5", "12/5"]) # pls automate me :'(
 
 charts = []
 i = 0
 for regione in regioni:
-    chartRegione, = ax.plot(xplot, gaussian_func(xplot,*popt[i]), visible=False, lw=2, color=RGB_tuples[i], label=regione)
+    chartRegione, = ax.plot(xplot, gaussian_func(xplot, *popt[i]), visible = False, lw = 2, color = RGB_tuples[i], label = regione)
     charts.append(chartRegione)
-    i+=1
+    i += 1
 
 # Set default visible charts #####
 labels = [str(chart.get_label()) for chart in charts]
@@ -119,7 +119,7 @@ charts[index].set_visible(True)
 ##################################
 
 visibility = [chart.get_visible() for chart in charts]
-chartItalia, = ax.plot(xplot, gaussian_func(xplot,*poptIt), visible=True, lw=2, color='b', label='Italia')
+chartItalia, = ax.plot(xplot, gaussian_func(xplot, *poptIt), visible = True, lw = 2, color = 'b', label = "Italia")
 ax.scatter(x, nuoviContagiItalia)
 charts.append(chartItalia)
 
