@@ -18,7 +18,6 @@ class github_downloader:
             print('Content was not found.')
             return -1
             
-   
     def downloadFiles(self):
         fileContents = []
         for url in self.urls:
