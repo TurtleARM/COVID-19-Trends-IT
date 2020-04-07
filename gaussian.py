@@ -4,7 +4,6 @@ from classes.github_downloader import github_downloader
 import matplotlib.pyplot as plt
 from matplotlib.widgets import CheckButtons
 from scipy.optimize import curve_fit
-import pandas as pd
 import colorsys
 import math 
 
