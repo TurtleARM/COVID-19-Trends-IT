@@ -98,12 +98,7 @@ for regione in regioni:
         else: 
             nuoviContagiRegioneT[regione].append(nuoviContagiRegione[regione][i] / nuoviTamponiRegione[regione][i])
 
-poptT, pcovT = [None] * len(nuoviContagiRegioneT), [None] * len(nuoviContagiRegioneT)
-
-i = 0
-for contagiRegione in nuoviContagiRegioneT:
-    poptT[i], pcovT[i] = curve_fit(gaussian_func, x, nuoviContagiRegioneT[contagiRegione])
-    i += 1
+poptT, pcovT = curve_fit(gaussian_func, x, nuoviContagiRegioneT["Lombardia"])
 
 # Gestione dati regionali senza tamponi
 popt, pcov = [None] * len(nuoviContagiRegioneT), [None] * len(nuoviContagiRegioneT)
@@ -150,14 +145,11 @@ fig = plt.gcf()
 fig.canvas.set_window_title('Andamento nuovi contagiati su tamponi effettuati in Italia')
 axes = plt.gca()
 axes.set_ylim([0, 0.5])
-plt.xticks([0, 10, 20, 30, 40, 52, 60, 70, 80], ["24/2", "3/3", "12/3", "22/3", "1/4", "13/4", "22/4", "2/5", "12/5"]) # pls automate me :'(
+plt.xticks([0, 10, 20, 30, 40, 50, 60, 71, 80], ["24/2", "5/3", "15/3", "25/3", "4/4", "14/4", "24/4", "4/5", "14/5"]) # pls automate me :'(
 
 charts = []
-i = 0
-for regione in regioni:
-    chartRegione, = ax.plot(xplot, gaussian_func(xplot, *poptT[i]), visible = False, lw = 2, color = RGB_tuples[i], label = regione)
-    charts.append(chartRegione)
-    i += 1
+chartRegione, = ax.plot(xplot, gaussian_func(xplot, *poptT), visible = False, lw = 2, color = RGB_tuples[0], label = "Lombardia")
+charts.append(chartRegione)
 
 # Set default visible charts #####
 labels = [str(chart.get_label()) for chart in charts]
@@ -181,7 +173,7 @@ axes = plt.gca()
 axes.set_ylim([0, 7000])
 
 fig.set_size_inches(12.5, 8.5, forward=True)
-plt.xticks([0, 10, 20, 30, 40, 52, 60, 70, 80], ["24/2", "3/3", "12/3", "22/3", "1/4", "13/4", "22/4", "2/5", "12/5"])
+plt.xticks([0, 10, 20, 30, 40, 50, 60, 70, 80], ["24/2", "5/3", "15/3", "25/3", "4/4", "14/4", "24/4", "4/5", "14/5"]) 
 
 chartsNew = []
 i = 0
