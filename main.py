@@ -106,37 +106,12 @@ for contagiRegione in nuoviContagiRegioneT:
     i += 1
 
 # Gestione dati regionali senza tamponi
-nuoviContagiRegione = {}
-nuoviContagiRegioneT = {}
-nuoviTamponiRegione = {}
-for regione in regioni: 
-    for line in regioni[regione]:
-        if regione not in nuoviContagiRegione:
-            nuoviContagiRegione[regione] = []
-            nuoviContagiRegioneT[regione] = []
-            nuoviTamponiRegione[regione] = []
-        nuoviContagiRegione[regione].append(int(line.split(',')[POS_POSITIVI]))
-        nuoviTamponiRegione[regione].append(int(line.split(',')[POS_TAMPONI_REGIONI]))
-
-for regione in regioni:
-    for i in range(len(tamponi) - 1):
-        if nuoviTamponiRegione[regione][i + 1] - nuoviTamponiRegione[regione][i] > 0:
-            nuoviTamponiRegione[regione][i + 1] = nuoviTamponiRegione[regione][i + 1] - nuoviTamponiRegione[regione][i]
-        else:
-            nuoviTamponiRegione[regione][i + 1] = 0
-    for i in x:
-        if (nuoviTamponiRegione[regione][i] == 0):
-            nuoviContagiRegioneT[regione].append(nuoviContagiRegione[regione][i])
-        else: 
-            nuoviContagiRegioneT[regione].append(nuoviContagiRegione[regione][i] / nuoviTamponiRegione[regione][i])
-
 popt, pcov = [None] * len(nuoviContagiRegioneT), [None] * len(nuoviContagiRegioneT)
 
 i = 0
 for contagiRegione in nuoviContagiRegione:
     popt[i], pcov[i] = curve_fit(gaussian_func, x, nuoviContagiRegione[contagiRegione])
     i += 1
-
 
 # Report
 MSE = 0
@@ -159,8 +134,8 @@ for i in xplot:
 
 print("There will be", gaussian_func(smallest, *poptIt), "cases on day", smallest)
 print("Model Relative Mean Squared Error:", RMSE)
-# Show charts
 
+# Show charts
 
 # Setup RGB colors
 N = len(regioni)
@@ -195,7 +170,7 @@ chartItalia, = ax.plot(xplot, gaussian_func(xplot, *poptItT), visible = True, lw
 ax.scatter(x, contagiSuTamponi)
 charts.append(chartItalia)
 
-
+# Second figure
 fig, ax = plt.subplots()
 plt.xlabel("Data")
 plt.ylabel("Casi")
