@@ -32,12 +32,12 @@ fileRegioni = CSV_parser("resources/regioni.csv")
 fileNazione = CSV_parser("resources/italia.csv")
 fileRegioniList, fileNazioneStr = fileRegioni.parseFileRegioni(), fileNazione.parseFileNazione()
 
-# Parsing regioni singole
+# Posizioni colonne 
 POS_NOME = fileRegioni.getTitles().index("denominazione_regione")
 POS_POSITIVI = fileRegioni.getTitles().index("nuovi_positivi")
+POS_TAMPONI_REGIONI = fileRegioni.getTitles().index("tamponi")
 POS_NUOVI_POSITIVI = fileNazione.getTitles().index("nuovi_positivi")
 POS_TAMPONI = fileNazione.getTitles().index("tamponi")
-POS_TAMPONI_REGIONI = fileRegioni.getTitles().index("tamponi")
 
 # Inizializza chiavi regioni e aggiungi 
 for line in fileRegioniList:
@@ -71,7 +71,7 @@ for i in x:
 poptItT, pcovItT = curve_fit(gaussian_func, x, contagiSuTamponi)
 
 # Gestione dati nazionali senza tamponi
-poptIt, pcovIt = curve_fit(gaussian_func, x, nuoviContagiItalia)
+poptIt, pcovIt = curve_fit(gaussian_func, x[:51], nuoviContagiItalia[:51])
 
 # Gestione dati regionali con tamponi
 nuoviContagiRegione = {}
@@ -105,29 +105,22 @@ popt, pcov = [None] * len(nuoviContagiRegioneT), [None] * len(nuoviContagiRegion
 
 i = 0
 for contagiRegione in nuoviContagiRegione:
-    popt[i], pcov[i] = curve_fit(gaussian_func, x, nuoviContagiRegione[contagiRegione])
+    popt[i], pcov[i] = curve_fit(gaussian_func, x[:51], nuoviContagiRegione[contagiRegione][:51])
     i += 1
 
 # Report
 MSE = 0
 for giorno in x:
-    MSE += math.pow(gaussian_func(giorno, *poptIt) - nuoviContagiItalia[giorno], 2)
+    MSE += math.pow(gaussian_func(giorno, *poptItT) - contagiSuTamponi[giorno], 2)
 MSE = MSE / giorni
 RMSE = math.sqrt(MSE)
 
 xplot = np.linspace(0, 90, 500)
 
-print("Expected number of new cases: ", gaussian_func(giorni - 1, *poptIt),
-      "\nActual number of new cases: ", nuoviContagiItalia[giorni - 1])
-print("Tomorrow's expected number of new cases: ", gaussian_func(giorni, *poptIt))
-print("R(t) =", gaussian_func(giorni - 1, *poptIt)/gaussian_func(giorni - 2, *poptIt), "over daily cycles")
-
-smallest = 0
-for i in xplot:
-    if gaussian_func(i, *poptIt) > 0.8 and gaussian_func(i, *poptIt) < 1.2:
-        smallest = i
-
-print("There will be", gaussian_func(smallest, *poptIt), "cases on day", smallest)
+print("Expected number of new cases: ", gaussian_func(giorni - 1, *poptItT) * nuoviTamponi[-1],
+      "\nActual number of new cases: ", contagiSuTamponi[-1] * nuoviTamponi[-1])
+print("Tomorrow's expected number of new cases (with today's amount of swabs): ", gaussian_func(giorni, *poptItT) * nuoviTamponi[-1])
+print("R(t) =", gaussian_func(giorni - 1, *poptIt) * nuoviTamponi[-1] / (gaussian_func(giorni - 2, *poptIt) * nuoviTamponi[-2]), "over daily cycles")
 print("Model Relative Mean Squared Error:", RMSE)
 
 # Show charts
@@ -142,7 +135,7 @@ fig, ax = plt.subplots()
 plt.xlabel("Data")
 plt.ylabel("Casi/Tamponi")
 fig = plt.gcf()
-fig.canvas.set_window_title('Andamento nuovi contagiati su tamponi effettuati in Italia')
+fig.canvas.set_window_title('Andamento nuovi tamponi positivi su tamponi effettuati in Italia e Lombardia')
 axes = plt.gca()
 axes.set_ylim([0, 0.5])
 plt.xticks([0, 10, 20, 30, 40, 50, 60, 71, 80], ["24/2", "5/3", "15/3", "25/3", "4/4", "14/4", "24/4", "4/5", "14/5"]) # pls automate me :'(
@@ -168,7 +161,7 @@ plt.xlabel("Data")
 plt.ylabel("Casi")
 plt.subplots_adjust(left = 0.45, bottom = 0.1, right = 0.96, top = 0.95)
 fig = plt.gcf()
-fig.canvas.set_window_title('Andamento nuovi contagiati in Italia')
+fig.canvas.set_window_title('Andamento nuovi tamponi positivi in Italia fino al 15 Aprile')
 axes = plt.gca()
 axes.set_ylim([0, 7000])
 
@@ -190,7 +183,7 @@ chartsNew[index].set_visible(True)
 
 visibility = [chart.get_visible() for chart in chartsNew]
 chartItalia, = ax.plot(xplot, gaussian_func(xplot, *poptIt), visible = True, lw = 2, color = 'b', label = "Italia")
-ax.scatter(x, nuoviContagiItalia)
+ax.scatter(x[:51], nuoviContagiItalia[:51])
 chartsNew.append(chartItalia)
 
 rax = plt.axes([0.01, 0.15, 0.34, 0.75])
