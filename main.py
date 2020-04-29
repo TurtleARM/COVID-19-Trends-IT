@@ -55,6 +55,8 @@ tamponi = []
 nuoviTamponi = []
 contagiSuTamponi = []
 for line in fileNazioneStr.splitlines():
+    if line == '':
+        break
     nuoviContagiItalia.append(int(line.split(',')[POS_NUOVI_POSITIVI]))
     tamponi.append(int(line.split(',')[POS_TAMPONI]))
 nuoviTamponi.append(tamponi[0])
